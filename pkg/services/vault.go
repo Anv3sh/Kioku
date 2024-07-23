@@ -4,6 +4,7 @@ import (
 	// "fmt"
 	"fmt"
 	"net"
+	"github.com/Anv3sh/Cache-Vault/pkg/constants"
 )
 
 type Vault struct{
@@ -18,7 +19,7 @@ func NewVault(config map[string]string) Vault{
 	return Vault{
 		Host: config["HOST"],
 		Port: config["PORT"],
-		quitch: make(chan struct{}, ULIMIT),
+		quitch: make(chan struct{}, constants.ULIMIT),
 	}
 }
 
