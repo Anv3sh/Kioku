@@ -4,17 +4,16 @@ import (
 	"fmt"
 	// "log"
 	// "net"
-	"github.com/Anv3sh/Cache-Vault/app/service"
+	"github.com/Anv3sh/Cache-Vault/pkg/services"
 )
 
 func main(){
-	vault := service.Vault{}
+	vault := services.Vault{}
 	config := map[string]string{
 		"HOST": "localhost",
 		"PORT": "6932",
-		"MACHINE": "Windows",
 	}
-
-	fmt.Println(vault.ConfigVault(&vault,config))
-	fmt.Printf("The Cache Vault is runnnig on: \nport= %s host=%s machine=%s", vault.Port,vault.Host,vault.Machine)
+	// vault.StartListening()
+	fmt.Println(vault.ConfigVault(config))
+	fmt.Printf("The Cache Vault is runnnig on: \nport= %s host=%s", vault.Port,vault.Host)
 }

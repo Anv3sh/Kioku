@@ -1,4 +1,4 @@
-package service
+package services
 
 import (
 	// "fmt"
@@ -7,7 +7,6 @@ import (
 type Vault struct{
 	Host string
 	Port string
-	Machine string
 }
 
 // func (v Vault) StartService(vault Vault) string{
@@ -15,10 +14,13 @@ type Vault struct{
 // 	return ("Vault session running...")
 // }
 
-func (v Vault) ConfigVault(vault *Vault, config map[string]string) string{
-	vault.Host = config["HOST"]
-	vault.Port = config["PORT"]
-	vault.Machine = config["MACHINE"]
+func (v *Vault) ConfigVault(config map[string]string) string{
+	v.Host = config["HOST"]
+	v.Port = config["PORT"]
 
 	return ("The vault is configured!!")
 }
+
+// func (v Vault) StartListening() error{
+	
+// }
