@@ -9,18 +9,10 @@ type Vault struct{
 	Port string
 }
 
-// func (v Vault) StartService(vault Vault) string{
-// 	fmt.Println("inside start service")
-// 	return ("Vault session running...")
-// }
 
-func (v *Vault) ConfigVault(config map[string]string) string{
-	v.Host = config["HOST"]
-	v.Port = config["PORT"]
-
-	return ("The vault is configured!!")
+func NewVault(config map[string]string) Vault{
+	return Vault{
+		Host: config["HOST"],
+		Port: config["PORT"],
+	}
 }
-
-// func (v Vault) StartListening() error{
-	
-// }
