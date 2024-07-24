@@ -1,9 +1,9 @@
 package services
 
 import (
-	// "fmt"
 	"fmt"
 	"net"
+	// "log"
 	"github.com/Anv3sh/Cache-Vault/pkg/constants"
 )
 
@@ -12,6 +12,7 @@ type Vault struct{
 	Port string
 	ln  net.Listener
 	quitch  chan struct{}
+	maxconnections chan struct{} // to manage the max number of client connections
 }
 
 
@@ -19,7 +20,8 @@ func NewVault(config map[string]string) Vault{
 	return Vault{
 		Host: config["HOST"],
 		Port: config["PORT"],
-		quitch: make(chan struct{}, constants.ULIMIT),
+		quitch: make(chan struct{}),
+		maxconnections: make(chan struct{}, constants.ULIMIT),
 	}
 }
 
@@ -39,16 +41,31 @@ func (v *Vault) StartListening() error{
 func (v *Vault) acceptLoop() {
 	for{
 		conn, err := v.ln.Accept()
+
 		if err != nil{
 			fmt.Println("accept error:", err)
 			continue
 		}
-		go v.readLoop(conn)
+
+		// if reached max connections reject new connection else accept and start readloop
+		select{
+		case v.maxconnections<-struct{}{}:
+			go v.readLoop(conn)
+		default:
+			conn.Close()
+            fmt.Println("Connection limit reached. Rejecting new connection.")
+		}
+
+		
 	}
 }
 
 func (v *Vault) readLoop(conn net.Conn){
-	defer conn.Close()
+	defer func() {
+		conn.Close()
+		<-v.maxconnections
+	}()
+
 	buf := make([]byte, 2048)
 
 	for{
