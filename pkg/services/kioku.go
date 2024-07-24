@@ -5,6 +5,8 @@ import (
 	"net"
 	// "log"
 	"github.com/Anv3sh/Kioku/pkg/constants"
+	"sync"
+	"bufio"
 )
 
 type Kioku struct{
@@ -13,6 +15,8 @@ type Kioku struct{
 	ln  net.Listener
 	quitch  chan struct{}
 	maxconnections chan struct{} // to manage the max number of client connections
+	Msgch chan []byte
+	mut sync.RWMutex //mutex to handle thread synchronization
 }
 
 
@@ -22,6 +26,7 @@ func NewKioku(config map[string]string) Kioku{
 		Port: config["PORT"],
 		quitch: make(chan struct{}),
 		maxconnections: make(chan struct{}, constants.ULIMIT),
+		Msgch: make(chan []byte, 10),
 	}
 }
 
@@ -35,6 +40,7 @@ func (k *Kioku) StartListening() error{
 	k.ln = ln
 	go k.acceptLoop()
 	<-k.quitch
+	close(k.Msgch)
 	return nil
 }
 
@@ -50,6 +56,7 @@ func (k *Kioku) acceptLoop() {
 		select{
 		case k.maxconnections<-struct{}{}:
 			fmt.Println("Connected to:", conn.RemoteAddr())
+			
 			go k.readLoop(conn)
 		default:
 			conn.Close()
@@ -66,15 +73,16 @@ func (k *Kioku) readLoop(conn net.Conn){
 		<-k.maxconnections
 	}()
 
-	buf := make([]byte, 2048)
-
+	// buf := make([]byte, 2048)
+	rw := bufio.NewReadWriter(bufio.NewReader(conn), bufio.NewWriter(conn))
 	for{
-		n,err:= conn.Read(buf)
+		conn.Write([]byte(k.ln.Addr().String()+"> "))
+
+		cmd,err:= rw.ReadString('\n')
 		if err!=nil{
 			fmt.Println("read error:", err)
 			continue
 		}
-		msg:=buf[:n]
-		fmt.Printf(string(msg))
+		k.Msgch <- []byte(cmd)
 	}
 }
