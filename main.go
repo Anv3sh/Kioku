@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 	// "net"
-	"github.com/Anv3sh/Kioku/pkg/services"
+	"github.com/Anv3sh/Kioku/internals/services"
 )
 
 func main() {
