@@ -7,7 +7,7 @@ import (
 	"github.com/Anv3sh/Kioku/pkg/constants"
 )
 
-type Vault struct{
+type Kioku struct{
 	Host string
 	Port string
 	ln  net.Listener
@@ -16,8 +16,8 @@ type Vault struct{
 }
 
 
-func NewVault(config map[string]string) Vault{
-	return Vault{
+func NewKioku(config map[string]string) Kioku{
+	return Kioku{
 		Host: config["HOST"],
 		Port: config["PORT"],
 		quitch: make(chan struct{}),
@@ -25,22 +25,22 @@ func NewVault(config map[string]string) Vault{
 	}
 }
 
-func (v *Vault) StartListening() error{
-	ln, err := net.Listen("tcp", v.Host+":"+v.Port)
+func (k *Kioku) StartListening() error{
+	ln, err := net.Listen("tcp", k.Host+":"+k.Port)
 	if err != nil {
 		return err
 	}
 
 	defer ln.Close()
-	v.ln = ln
-	go v.acceptLoop()
-	<-v.quitch
+	k.ln = ln
+	go k.acceptLoop()
+	<-k.quitch
 	return nil
 }
 
-func (v *Vault) acceptLoop() {
+func (k *Kioku) acceptLoop() {
 	for{
-		conn, err := v.ln.Accept()
+		conn, err := k.ln.Accept()
 
 		if err != nil{
 			fmt.Println("accept error:", err)
@@ -48,9 +48,9 @@ func (v *Vault) acceptLoop() {
 		}
 		// if reached max connections reject new connection else accept and start readloop
 		select{
-		case v.maxconnections<-struct{}{}:
+		case k.maxconnections<-struct{}{}:
 			fmt.Println("Connected to:", conn.RemoteAddr())
-			go v.readLoop(conn)
+			go k.readLoop(conn)
 		default:
 			conn.Close()
             fmt.Println("Connection limit reached. Rejecting new connection.")
@@ -60,10 +60,10 @@ func (v *Vault) acceptLoop() {
 	}
 }
 
-func (v *Vault) readLoop(conn net.Conn){
+func (k *Kioku) readLoop(conn net.Conn){
 	defer func() {
 		conn.Close()
-		<-v.maxconnections
+		<-k.maxconnections
 	}()
 
 	buf := make([]byte, 2048)

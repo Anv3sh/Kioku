@@ -12,7 +12,7 @@ func main(){
 		"HOST": "localhost",
 		"PORT": "6379",
 	}
-	vault := services.NewVault(config)
-	log.Fatal(vault.StartListening())
-	log.Printf("The Cache Vault is started listening on: \nport= %s host=%s", vault.Port,vault.Host)
+	kioku := services.NewKioku(config)
+	log.Fatal(kioku.StartListening())
+	log.Printf("The Cache Vault is started listening on: \nport= %s host=%s", kioku.Port,kioku.Host)
 }
