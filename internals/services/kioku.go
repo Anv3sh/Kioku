@@ -5,7 +5,7 @@ import (
 	"net"
 	// "log"
 	"bufio"
-	"github.com/Anv3sh/Kioku/pkg/constants"
+	"github.com/Anv3sh/Kioku/internals/constants"
 	"sync"
 )
 
