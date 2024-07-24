@@ -1,3 +1,3 @@
-module github.com/Anv3sh/Cache-Vault
+module github.com/Anv3sh/Kioku
 
 go 1.22.4

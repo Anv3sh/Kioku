@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net"
 	// "log"
-	"github.com/Anv3sh/Cache-Vault/pkg/constants"
+	"github.com/Anv3sh/Kioku/pkg/constants"
 )
 
 type Vault struct{
@@ -46,10 +46,10 @@ func (v *Vault) acceptLoop() {
 			fmt.Println("accept error:", err)
 			continue
 		}
-
 		// if reached max connections reject new connection else accept and start readloop
 		select{
 		case v.maxconnections<-struct{}{}:
+			fmt.Println("Connected to:", conn.RemoteAddr())
 			go v.readLoop(conn)
 		default:
 			conn.Close()
