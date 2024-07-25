@@ -70,12 +70,10 @@ func (k *Kioku) readLoop(conn net.Conn) {
 		conn.Close()
 		<-k.maxconnections
 	}()
-
 	// buf := make([]byte, 2048)
 	rw := bufio.NewReadWriter(bufio.NewReader(conn), bufio.NewWriter(conn))
 	for {
-		conn.Write([]byte(k.ln.Addr().String() + "> "))
-
+		conn.Write([]byte(k.ln.Addr().String() + "> \n"))
 		cmd, err := rw.ReadString('\n')
 		if err != nil {
 			fmt.Println("read error:", err)
