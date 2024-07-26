@@ -8,9 +8,8 @@ import (
 )
 
 func main() {
-    // Get server address and port from command-line arguments or user input.
     serverAddr := "localhost"
-    serverPort := "6379" // Default Telnet port
+    serverPort := "6379"
 
     // Establish a TCP connection to the Telnet server.
     conn, err := net.Dial("tcp", serverAddr+":"+serverPort)
@@ -20,18 +19,21 @@ func main() {
     }
     defer conn.Close()
 
-    // Create reader and writer for the connection.
-    reader := bufio.NewReader(conn)
+    // reader := bufio.NewReader(conn)
     writer := bufio.NewWriter(conn)
 
     // Interactive loop to send commands and receive responses.
-    go func() {
-        for {
-            // Read server response and print it.
-            msg, _ := reader.ReadByte()
-            fmt.Print(msg)
-        }
-    }()
+    // go func() {
+    //     for {
+    //         buf := make([]byte, 1024)
+    //         // Read server response and print it.
+    //         _, err:=conn.Read(buf)
+    //         if err !=nil{
+    //             fmt.Printf("read data failed: ",buf)
+    //         }
+    //         fmt.Printf(string(buf))
+    //     }
+    // }()
 
     // Read user input and send it to the server.
     scanner := bufio.NewScanner(os.Stdin)
