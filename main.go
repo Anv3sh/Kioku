@@ -20,5 +20,5 @@ func main() {
 	}()
 	log.Fatal(kioku.StartListening())
 
-	log.Printf("The Cache Vault is started listening on: \nport= %s host=%s", kioku.Port, kioku.Host)
+	log.Printf("Kioku started listening on: \nport= %s host=%s", kioku.ServerPort, kioku.ServerHost)
 }

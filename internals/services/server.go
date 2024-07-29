@@ -10,8 +10,8 @@ import (
 )
 
 type Kioku struct {
-	Host           string
-	Port           string
+	ServerHost           string
+	ServerPort           string
 	ln             net.Listener
 	quitch         chan struct{}
 	maxconnections chan struct{} // to manage the max number of client connections
@@ -21,8 +21,8 @@ type Kioku struct {
 
 func NewKioku() Kioku {
 	return Kioku{
-		Host:           constants.CONFIG.ServerHost,
-		Port:           constants.CONFIG.ServerPort,
+		ServerHost:           constants.CONFIG.ServerHost,
+		ServerPort:           constants.CONFIG.ServerPort,
 		quitch:         make(chan struct{}),
 		maxconnections: make(chan struct{}, constants.ULIMIT),
 		Msgch:          make(chan []byte, 10),
@@ -30,7 +30,7 @@ func NewKioku() Kioku {
 }
 
 func (k *Kioku) StartListening() error {
-	ln, err := net.Listen("tcp", k.Host+":"+k.Port)
+	ln, err := net.Listen("tcp", k.ServerHost+":"+k.ServerPort)
 	if err != nil {
 		return err
 	}
