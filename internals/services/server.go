@@ -19,10 +19,10 @@ type Kioku struct {
 	mut            sync.RWMutex //mutex to handle thread synchronization
 }
 
-func NewKioku(config map[string]string) Kioku {
+func NewKioku() Kioku {
 	return Kioku{
-		Host:           config["HOST"],
-		Port:           config["PORT"],
+		Host:           constants.CONFIG.ServerHost,
+		Port:           constants.CONFIG.ServerPort,
 		quitch:         make(chan struct{}),
 		maxconnections: make(chan struct{}, constants.ULIMIT),
 		Msgch:          make(chan []byte, 10),

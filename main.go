@@ -1,19 +1,19 @@
 package main
 
 import (
-	// "fmt"
 	"fmt"
 	"log"
 	// "net"
 	"github.com/Anv3sh/Kioku/internals/services"
+	"github.com/Anv3sh/Kioku/internals/config"
+	"github.com/Anv3sh/Kioku/internals/constants"
 )
 
+
 func main() {
-	config := map[string]string{
-		"HOST": "localhost",
-		"PORT": "6379",
-	}
-	kioku := services.NewKioku(config)
+	config.SetConfig(&constants.CONFIG)
+	kioku := services.NewKioku()
+	
 	go func() {
 		for msg := range kioku.Msgch {
 			fmt.Println("recieved mssg from connection:", string(msg))
