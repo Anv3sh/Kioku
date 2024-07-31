@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-type Cmd struct {
+type CmdDetails struct {
 	Name      string   `json:"name"`
 	Info      string   `json:"info"`
 	TotalArgs int      `json:"total_arguments"`
@@ -14,21 +14,18 @@ type Cmd struct {
 }
 
 type RegisteredCommands struct {
-	Cmds []Cmd `json:"commands"`
+	Cmds map[string]CmdDetails `json:"commands"`
 }
 
-func CommandRegistry(regCmds *RegisteredCommands, cmdsListPath string) error {
+func CommandRegistry(regCmds *RegisteredCommands, cmdsListPath string){
 	content, err := os.ReadFile(cmdsListPath)
 	if err != nil {
 		log.Fatal("Error when opening file: ", err)
-		return err
 	}
 
 	err = json.Unmarshal(content, &regCmds)
 	if err != nil {
 		log.Fatal("Error during Unmarshal(): ", err)
-		return err
 	}
-
-	return nil
+	log.Println("Command registry complete.")
 }

@@ -1,16 +1,19 @@
 {
-    "commands":[
-        {
-            "name":"PING",
-            "info":"returns pong.",
-            "total_arguments":0,
-            "arguments":[]
-        },
-        {
-            "name":"SET",
-            "info":"sets a key value pair in db",
-            "total_arguments":2,
-            "arguments":["key","value"]
-        }
-    ]
+    "commands":{
+        "PING":
+            {
+                "name":"PING",
+                "info":"returns pong.",
+                "total_arguments":0,
+                "arguments":[]
+            }
+        ,
+        "SET":
+            {
+                "name":"SET",
+                "info":"sets a key value pair in db",
+                "total_arguments":2,
+                "arguments":["key","value"]
+            }
+    }
 }

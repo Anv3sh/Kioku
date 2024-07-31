@@ -19,4 +19,5 @@ func SetConfig(config *Config) {
 	if err := viper.Unmarshal(&config); err != nil {
 		log.Fatal("Error unmarshaling config: ", err)
 	}
+	log.Println("Kioku configurations set.")
 }
