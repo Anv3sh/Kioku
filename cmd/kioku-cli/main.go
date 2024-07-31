@@ -22,19 +22,6 @@ func main() {
     // reader := bufio.NewReader(conn)
     writer := bufio.NewWriter(conn)
 
-    // Interactive loop to send commands and receive responses.
-    // go func() {
-    //     for {
-    //         buf := make([]byte, 1024)
-    //         // Read server response and print it.
-    //         _, err:=conn.Read(buf)
-    //         if err !=nil{
-    //             fmt.Printf("read data failed: ",buf)
-    //         }
-    //         fmt.Printf(string(buf))
-    //     }
-    // }()
-
     // Read user input and send it to the server.
     scanner := bufio.NewScanner(os.Stdin)
     for scanner.Scan() {

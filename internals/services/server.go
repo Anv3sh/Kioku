@@ -6,12 +6,14 @@ import (
 	// "log"
 	"bufio"
 	"github.com/Anv3sh/Kioku/internals/constants"
+	"strings"
 	"sync"
+	// "github.com/Anv3sh/Kioku/internals/commands"
 )
 
 type Kioku struct {
-	ServerHost           string
-	ServerPort           string
+	ServerHost     string
+	ServerPort     string
 	ln             net.Listener
 	quitch         chan struct{}
 	maxconnections chan struct{} // to manage the max number of client connections
@@ -21,8 +23,8 @@ type Kioku struct {
 
 func NewKioku() Kioku {
 	return Kioku{
-		ServerHost:           constants.CONFIG.ServerHost,
-		ServerPort:           constants.CONFIG.ServerPort,
+		ServerHost:     constants.CONFIG.ServerHost,
+		ServerPort:     constants.CONFIG.ServerPort,
 		quitch:         make(chan struct{}),
 		maxconnections: make(chan struct{}, constants.ULIMIT),
 		Msgch:          make(chan []byte, 10),
@@ -74,11 +76,14 @@ func (k *Kioku) readLoop(conn net.Conn) {
 	rw := bufio.NewReadWriter(bufio.NewReader(conn), bufio.NewWriter(conn))
 	for {
 		conn.Write([]byte(k.ln.Addr().String() + "> \r\n"))
-		cmd, err := rw.ReadString('\n')
+		argv, err := rw.ReadString('\n')
 		if err != nil {
 			fmt.Println("read error:", err)
 			continue
 		}
-		k.Msgch <- []byte(cmd)
+		strings.TrimSpace(argv)
+		args := strings.Fields(argv)
+
+		k.Msgch <- []byte(args[0])
 	}
 }
