@@ -1,7 +1,6 @@
 package storage
 
 import(
-	"log"
 	"github.com/Anv3sh/Kioku/internals/config"
 	"unsafe"
 )
