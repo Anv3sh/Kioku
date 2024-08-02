@@ -11,14 +11,14 @@ type CmdDetails struct {
 	Info      string   `json:"info"`
 	TotalArgs int      `json:"total_arguments"`
 	Args      []string `json:"arguments"`
-	Function	string `json:"function"`
+	Function  string   `json:"function"`
 }
 
 type RegisteredCommands struct {
 	Cmds map[string]CmdDetails `json:"commands"`
 }
 
-func CommandRegistry(regCmds *RegisteredCommands, cmdsListPath string){
+func CommandRegistry(regCmds *RegisteredCommands, cmdsListPath string) {
 	content, err := os.ReadFile(cmdsListPath)
 	if err != nil {
 		log.Fatal("Error when opening file: ", err)

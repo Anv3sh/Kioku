@@ -12,7 +12,7 @@ const (
 )
 
 var (
-	CONFIG  config.Config
-	REGCMDS cmdutils.RegisteredCommands
+	CONFIG    config.Config
+	REGCMDS   cmdutils.RegisteredCommands
 	LFU_CACHE storage.LFU
 )

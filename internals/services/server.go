@@ -10,11 +10,10 @@ import (
 	"strings"
 	"sync"
 
-	"time"
 	"github.com/Anv3sh/Kioku/internals/constants"
 	"github.com/Anv3sh/Kioku/internals/services/cmdutils"
 	"github.com/Anv3sh/Kioku/internals/storage"
-
+	"time"
 )
 
 type Kioku struct {
@@ -24,7 +23,7 @@ type Kioku struct {
 	quitch         chan struct{}
 	maxconnections chan struct{} // to manage the max number of client connections
 	Msgch          chan []byte
-	Connch		   chan net.Conn
+	Connch         chan net.Conn
 	mut            sync.RWMutex //mutex to handle thread synchronization
 }
 
@@ -41,7 +40,7 @@ func NewKioku() Kioku {
 
 func (k *Kioku) StartListening() error {
 	ln, err := net.Listen("tcp", k.ServerHost+":"+k.ServerPort)
-	log.Println("Kioku started listening on-> "+k.ServerHost+":"+k.ServerPort)
+	log.Println("Kioku started listening on-> " + k.ServerHost + ":" + k.ServerPort)
 	if err != nil {
 		return err
 	}
@@ -78,15 +77,15 @@ func (k *Kioku) acceptLoop() {
 
 func (k *Kioku) readLoop(conn net.Conn) {
 	defer func() {
-		log.Println("Disconnected from: "+conn.RemoteAddr().String())
+		log.Println("Disconnected from: " + conn.RemoteAddr().String())
 		conn.Close()
 		<-k.maxconnections
 	}()
-	lfu:=storage.CreateLFU(constants.CONFIG)
+	lfu := storage.CreateLFU(constants.CONFIG)
 	// buf := make([]byte, 2048)
 	rw := bufio.NewReadWriter(bufio.NewReader(conn), bufio.NewWriter(conn))
 	for {
-		conn.Write([]byte(k.Ln.Addr().String()+"> \r\n"))
+		conn.Write([]byte(k.Ln.Addr().String() + "> \r\n"))
 		argv, err := rw.ReadString('\n')
 		if err != nil {
 			fmt.Println("read error:", err)
@@ -94,9 +93,9 @@ func (k *Kioku) readLoop(conn net.Conn) {
 		}
 		strings.TrimSpace(argv)
 		args := strings.Fields(argv)
-		msg := cmdutils.CommandChecker(args, &constants.REGCMDS,&lfu)
+		msg := cmdutils.CommandChecker(args, &constants.REGCMDS, &lfu)
 		k.Connch <- conn
-		k.Msgch<-msg
-		time.Sleep(500*time.Millisecond)
+		k.Msgch <- msg
+		time.Sleep(500 * time.Millisecond)
 	}
 }

@@ -10,20 +10,19 @@ import (
 	"github.com/Anv3sh/Kioku/internals/services/cmdutils"
 )
 
-
 func main() {
 	go cmdutils.CommandRegistry(&constants.REGCMDS, constants.COMMAND_LIST_PATH)
 	config.SetConfig(&constants.CONFIG)
-	
+
 	kioku := services.NewKioku()
-	
+
 	go func() {
-		for{
-			conn:= <- kioku.Connch
-			msg:= <- kioku.Msgch
+		for {
+			conn := <-kioku.Connch
+			msg := <-kioku.Msgch
 			conn.Write(msg)
 		}
-		
+
 	}()
 	//ttl logic:
 	// if constants.CONFIG.Eviction{
