@@ -9,16 +9,16 @@ import (
 	"bufio"
 	"strings"
 	"sync"
-	// "time"
 
+	"time"
 	"github.com/Anv3sh/Kioku/internals/constants"
-	// "github.com/Anv3sh/Kioku/internals/commands"
+	"github.com/Anv3sh/Kioku/internals/services/cmdutils"
 )
 
 type Kioku struct {
 	ServerHost     string
 	ServerPort     string
-	ln             net.Listener
+	Ln             net.Listener
 	quitch         chan struct{}
 	maxconnections chan struct{} // to manage the max number of client connections
 	Msgch          chan []byte
@@ -32,30 +32,30 @@ func NewKioku() Kioku {
 		ServerPort:     constants.CONFIG.ServerPort,
 		quitch:         make(chan struct{}),
 		maxconnections: make(chan struct{}, constants.ULIMIT),
-		Msgch:          make(chan []byte, 10),
+		Msgch:          make(chan []byte, 50),
 		Connch:         make(chan net.Conn),
 	}
 }
 
 func (k *Kioku) StartListening() error {
 	ln, err := net.Listen("tcp", k.ServerHost+":"+k.ServerPort)
-	log.Println("Kioku started listening on: \nport= "+k.ServerPort+" host= "+k.ServerHost)
+	log.Println("Kioku started listening on-> "+k.ServerHost+":"+k.ServerPort)
 	if err != nil {
 		return err
 	}
 
 	defer ln.Close()
-	k.ln = ln
+	k.Ln = ln
 	go k.acceptLoop()
 	<-k.quitch
 	close(k.Msgch)
 	close(k.Connch)
-	return net.ErrClosed
+	return nil
 }
 
 func (k *Kioku) acceptLoop() {
 	for {
-		conn, err := k.ln.Accept()
+		conn, err := k.Ln.Accept()
 
 		if err != nil {
 			fmt.Println("accept error:", err)
@@ -77,12 +77,14 @@ func (k *Kioku) acceptLoop() {
 
 func (k *Kioku) readLoop(conn net.Conn) {
 	defer func() {
+		log.Println("Disconnected from: "+conn.RemoteAddr().String())
 		conn.Close()
 		<-k.maxconnections
 	}()
 	// buf := make([]byte, 2048)
 	rw := bufio.NewReadWriter(bufio.NewReader(conn), bufio.NewWriter(conn))
 	for {
+		conn.Write([]byte(k.Ln.Addr().String()+"> \r\n"))
 		argv, err := rw.ReadString('\n')
 		if err != nil {
 			fmt.Println("read error:", err)
@@ -90,13 +92,9 @@ func (k *Kioku) readLoop(conn net.Conn) {
 		}
 		strings.TrimSpace(argv)
 		args := strings.Fields(argv)
-		_, exists := constants.REGCMDS.Cmds[strings.ToUpper(args[0])]
+		msg := cmdutils.CommandChecker(args, &constants.REGCMDS)
 		k.Connch <- conn
-		if !exists{
-			k.Msgch <- []byte("No command found!\n"+k.ln.Addr().String() + "> \r\n")
-		}else{
-			k.Msgch <- []byte("OK\n"+k.ln.Addr().String() + "> \r\n")	
-		}
-		// time.Sleep(1*time.Second)
+		k.Msgch<-msg
+		time.Sleep(1*time.Second)
 	}
 }

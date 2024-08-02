@@ -6,20 +6,20 @@ import (
 	"github.com/Anv3sh/Kioku/internals/config"
 	"github.com/Anv3sh/Kioku/internals/constants"
 	"github.com/Anv3sh/Kioku/internals/services"
-	"github.com/Anv3sh/Kioku/internals/services/cmdreg"
+	"github.com/Anv3sh/Kioku/internals/services/cmdutils"
 )
 
 
 func main() {
-	go cmdreg.CommandRegistry(&constants.REGCMDS, constants.COMMAND_LIST_PATH)
+	go cmdutils.CommandRegistry(&constants.REGCMDS, constants.COMMAND_LIST_PATH)
 	config.SetConfig(&constants.CONFIG)
 	kioku := services.NewKioku()
 
 	go func() {
-		for conn:= range kioku.Connch{
-			for msg := range kioku.Msgch {
-				conn.Write(msg)
-			}
+		for{
+			conn:= <- kioku.Connch
+			msg:= <- kioku.Msgch
+			conn.Write(msg)
 		}
 		
 	}()

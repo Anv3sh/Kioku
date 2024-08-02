@@ -2,7 +2,7 @@ package constants
 
 import (
 	"github.com/Anv3sh/Kioku/internals/config"
-	"github.com/Anv3sh/Kioku/internals/services/cmdreg"
+	"github.com/Anv3sh/Kioku/internals/services/cmdutils"
 )
 
 const (
@@ -12,5 +12,5 @@ const (
 
 var (
 	CONFIG  config.Config
-	REGCMDS cmdreg.RegisteredCommands
+	REGCMDS cmdutils.RegisteredCommands
 )
