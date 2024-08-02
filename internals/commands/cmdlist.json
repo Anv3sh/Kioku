@@ -5,7 +5,8 @@
                 "name":"PING",
                 "info":"returns pong.",
                 "total_arguments":0,
-                "arguments":[]
+                "arguments":[],
+                "function":"PingCommand"
             }
         ,
         "SET":
@@ -13,7 +14,8 @@
                 "name":"SET",
                 "info":"sets a key value pair in db",
                 "total_arguments":2,
-                "arguments":["key","value"]
+                "arguments":["key","value"],
+                "function":"SetCommand"
             }
     }
 }
