@@ -4,19 +4,26 @@ import (
 	"fmt"
 	"strings"
 	"github.com/Anv3sh/Kioku/internals/commands"
+	"github.com/Anv3sh/Kioku/internals/storage"
+
 )
 
-type CmdFunction func([]string) []byte
+type CmdFunction func([]string, *storage.LFU) []byte
 
 const PING_FUNC = "PingCommand"
 const SET_FUNC = "SetCommand"
+const GET_FUNC = "GetCommand"
 
 var CmdFunctions = map[string]CmdFunction{
 	PING_FUNC:commands.PingCommand,
 	SET_FUNC:commands.SetCommand,
+	GET_FUNC:commands.GetCommand,
 }
 
-func CommandChecker(args []string, regcmds *RegisteredCommands)[]byte{
+func CommandChecker(args []string, regcmds *RegisteredCommands,lfu *storage.LFU)[]byte{
+	if len(args)==0{
+		return []byte("")
+	}
 	cmd, exists := regcmds.Cmds[strings.ToUpper(args[0])]
 	if !exists{
 		return []byte("Command not found.\n")
@@ -25,7 +32,7 @@ func CommandChecker(args []string, regcmds *RegisteredCommands)[]byte{
 		return []byte(msg)	
 	}else{
 		cmdfunc:=CmdFunctions[cmd.Function]
-		msg:= cmdfunc(args)
+		msg:= cmdfunc(args,lfu)
 		return msg
 	}
 	

@@ -1,14 +1,20 @@
 package config
 
 import (
-	"github.com/spf13/viper"
 	"log"
+	"time"
+
+	"github.com/spf13/viper"
 )
 
 type Config struct {
 	ServerHost string `mapstructure:"host"`
 	ServerPort string `mapstructure:"port"`
 	MaxClients int    `mapstructure:"maxclients"`
+	TotalTimetoLive time.Duration `mapstructure:"ttl"`
+	Eviction	bool	`mapstructure:"eviction"`
+	// CacheSize  int64	`mapstructure:"cache_size"`
+	MaxMem		float64	`mapstructure:"maxmemory"`
 }
 
 func SetConfig(config *Config) {

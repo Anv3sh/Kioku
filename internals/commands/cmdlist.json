@@ -17,5 +17,14 @@
                 "arguments":["key","value"],
                 "function":"SetCommand"
             }
+        ,
+        "GET":
+            {
+                "name":"GET",
+                "info":"gets a value for a key in db",
+                "total_arguments":1,
+                "arguments":["key"],
+                "function":"GetCommand"
+            }
     }
 }

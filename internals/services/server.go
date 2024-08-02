@@ -13,6 +13,8 @@ import (
 	"time"
 	"github.com/Anv3sh/Kioku/internals/constants"
 	"github.com/Anv3sh/Kioku/internals/services/cmdutils"
+	"github.com/Anv3sh/Kioku/internals/storage"
+
 )
 
 type Kioku struct {
@@ -56,7 +58,6 @@ func (k *Kioku) StartListening() error {
 func (k *Kioku) acceptLoop() {
 	for {
 		conn, err := k.Ln.Accept()
-
 		if err != nil {
 			fmt.Println("accept error:", err)
 			continue
@@ -81,6 +82,7 @@ func (k *Kioku) readLoop(conn net.Conn) {
 		conn.Close()
 		<-k.maxconnections
 	}()
+	lfu:=storage.CreateLFU(constants.CONFIG)
 	// buf := make([]byte, 2048)
 	rw := bufio.NewReadWriter(bufio.NewReader(conn), bufio.NewWriter(conn))
 	for {
@@ -92,9 +94,9 @@ func (k *Kioku) readLoop(conn net.Conn) {
 		}
 		strings.TrimSpace(argv)
 		args := strings.Fields(argv)
-		msg := cmdutils.CommandChecker(args, &constants.REGCMDS)
+		msg := cmdutils.CommandChecker(args, &constants.REGCMDS,&lfu)
 		k.Connch <- conn
 		k.Msgch<-msg
-		time.Sleep(1*time.Second)
+		time.Sleep(500*time.Millisecond)
 	}
 }
