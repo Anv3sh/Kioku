@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net"
-
+	"io"
 	// "log"
 	"bufio"
 	"strings"
@@ -64,12 +64,12 @@ func (k *Kioku) acceptLoop() {
 		// if reached max connections reject new connection else accept and start readloop
 		select {
 		case k.maxconnections <- struct{}{}:
-			fmt.Println("Connected to:", conn.RemoteAddr())
+			log.Println("Connected to:", conn.RemoteAddr())
 
 			go k.readLoop(conn)
 		default:
 			conn.Close()
-			fmt.Println("Connection limit reached. Rejecting new connection.")
+			log.Println("Connection limit reached. Rejecting new connection.")
 		}
 
 	}
@@ -77,7 +77,7 @@ func (k *Kioku) acceptLoop() {
 
 func (k *Kioku) readLoop(conn net.Conn) {
 	defer func() {
-		log.Println("Disconnected from: " + conn.RemoteAddr().String())
+		log.Println(conn.RemoteAddr().String()+" disconnected.")
 		conn.Close()
 		<-k.maxconnections
 	}()
@@ -88,6 +88,9 @@ func (k *Kioku) readLoop(conn net.Conn) {
 		conn.Write([]byte(k.Ln.Addr().String() + "> \r\n"))
 		argv, err := rw.ReadString('\n')
 		if err != nil {
+			if err == io.EOF {
+				return
+			}
 			fmt.Println("read error:", err)
 			continue
 		}
