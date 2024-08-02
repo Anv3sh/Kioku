@@ -41,7 +41,6 @@ func (l *LFU) Insert(node *Node){
 
 func(l *LFU) DeleteLF(){
 	delete(l.Store,l.MinHeap[0].Key)
-	log.Println("DELETED key value from store.")
 	l.MinHeap[0]=l.MinHeap[len(l.MinHeap)-1]
 	l.MinHeap=l.MinHeap[:len(l.MinHeap)-1]
 	curr_idx:=0
