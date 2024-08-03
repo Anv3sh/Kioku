@@ -12,7 +12,6 @@ import (
 
 	"github.com/Anv3sh/Kioku/internals/constants"
 	"github.com/Anv3sh/Kioku/internals/services/cmdutils"
-	"github.com/Anv3sh/Kioku/internals/storage"
 	"time"
 )
 
@@ -81,7 +80,6 @@ func (k *Kioku) readLoop(conn net.Conn) {
 		conn.Close()
 		<-k.maxconnections
 	}()
-	lfu := storage.CreateLFU(constants.CONFIG)
 	// buf := make([]byte, 2048)
 	rw := bufio.NewReadWriter(bufio.NewReader(conn), bufio.NewWriter(conn))
 	for {
@@ -91,12 +89,12 @@ func (k *Kioku) readLoop(conn net.Conn) {
 			if err == io.EOF {
 				return
 			}
-			fmt.Println("read error:", err)
-			continue
+			// fmt.Println("read error:", err)
+			return
 		}
 		strings.TrimSpace(argv)
 		args := strings.Fields(argv)
-		msg := cmdutils.CommandChecker(args, &constants.REGCMDS, &lfu)
+		msg := cmdutils.CommandChecker(args, &constants.REGCMDS, &constants.LFU_CACHE)
 		k.Connch <- conn
 		k.Msgch <- msg
 		time.Sleep(500 * time.Millisecond)

@@ -13,7 +13,7 @@ import (
 func main() {
 	go cmdutils.CommandRegistry(&constants.REGCMDS, constants.COMMAND_LIST_PATH)
 	config.SetConfig(&constants.CONFIG)
-
+	constants.LFU_CACHE.CreateLFU(constants.CONFIG)
 	kioku := services.NewKioku()
 
 	go func() {

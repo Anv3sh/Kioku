@@ -17,12 +17,11 @@ type LFU struct{
 
 // }
 
-func CreateLFU(conf config.Config ) LFU{
-	return LFU{
-		Store: make(map[string]*Node),
-		MaxMem: conf.MaxMem,
-		Eviction: conf.Eviction,
-	}
+func (l *LFU) CreateLFU(conf config.Config ){
+	l.Store=make(map[string]*Node)
+	l.MaxMem=conf.MaxMem
+	l.Eviction=conf.Eviction
+
 }
 
 func (l *LFU) Insert(node *Node){
