@@ -2,13 +2,12 @@ package storage
 
 import(
 	"github.com/Anv3sh/Kioku/internals/config"
-	"unsafe"
+	"github.com/Anv3sh/Kioku/internals/types"
+
 )
 
 type LFU struct{
-	Store map[string]*Node
 	MinHeap []*Node
-	MaxMem float64
 	Eviction bool
 }
 
@@ -18,13 +17,13 @@ type LFU struct{
 // }
 
 func (l *LFU) CreateLFU(conf config.Config ){
-	l.Store=make(map[string]*Node)
-	l.MaxMem=conf.MaxMem
-	l.Eviction=conf.Eviction
+	l.Eviction=conf.LFUEviction
 
 }
 
-func (l *LFU) Insert(node *Node){
+func (l *LFU) Insert(k *types.Kioku, node *Node){
+	k.Mut.Lock()
+	defer k.Mut.Unlock()
 	l.MinHeap = append(l.MinHeap, node)
 	curr_idx := len(l.MinHeap)-1
 	parent_idx:=int(curr_idx/2)
@@ -37,8 +36,7 @@ func (l *LFU) Insert(node *Node){
 	}
 }
 
-func(l *LFU) DeleteLF(){
-	delete(l.Store,l.MinHeap[0].Key)
+func(l *LFU) Evict(k *types.Kioku){
 	l.MinHeap[0]=l.MinHeap[len(l.MinHeap)-1]
 	l.MinHeap=l.MinHeap[:len(l.MinHeap)-1]
 	curr_idx:=0
@@ -62,10 +60,10 @@ func(l *LFU) DeleteLF(){
 }
 }
 
-func (l *LFU) Size() float64{
-	sizeInBytes := len(l.MinHeap) * int(unsafe.Sizeof(l.MinHeap[0]))
-	return float64(sizeInBytes) / (1024 * 1024)
-}
+// func (l *LFU) GetMemUsage() float64{
+// 	sizeInBytes := len(l.MinHeap) * int(l.MinHeap[0].GetMemUsage())
+// 	return float64(sizeInBytes) / (1024 * 1024)
+// }
 //TTL:300sec
 
 //root node min

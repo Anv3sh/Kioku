@@ -12,12 +12,23 @@ type Config struct {
 	ServerPort      string        `mapstructure:"port"`
 	MaxClients      int           `mapstructure:"maxclients"`
 	TotalTimetoLive time.Duration `mapstructure:"ttl"`
-	Eviction        bool          `mapstructure:"eviction"`
 	// CacheSize  int64	`mapstructure:"cache_size"`
 	MaxMem float64 `mapstructure:"maxmemory"`
+	LFUEviction     bool `mapstructure:"lfu-eviction"`
+	LRUEviction 	bool `mapstructure:"lru-eviction"`
 }
 
-func SetConfig(config *Config) {
+func (config *Config) CreateConfig(){
+	config.ServerHost="localhost"
+	config.ServerPort="6379"
+	config.MaxClients=100
+	config.TotalTimetoLive=300
+	config.MaxMem=0.00005
+	config.LFUEviction=true
+	config.LRUEviction=false
+}
+
+func (config *Config) SetConfig() {
 	viper.SetConfigFile("./kioku.yaml")
 	if err := viper.ReadInConfig(); err != nil {
 		log.Fatal("Error reading config: ", err)

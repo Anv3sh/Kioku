@@ -15,4 +15,6 @@ var (
 	CONFIG    config.Config
 	REGCMDS   cmdutils.RegisteredCommands
 	LFU_CACHE storage.LFU
+	DICTIONARY storage.Dict
+	LRU_CACHE storage.LRU
 )

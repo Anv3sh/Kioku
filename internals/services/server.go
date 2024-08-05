@@ -8,36 +8,27 @@ import (
 	// "log"
 	"bufio"
 	"strings"
-	"sync"
-
+	
+	"github.com/Anv3sh/Kioku/internals/types"
 	"github.com/Anv3sh/Kioku/internals/constants"
 	"github.com/Anv3sh/Kioku/internals/services/cmdutils"
 	"time"
 )
 
-type Kioku struct {
-	ServerHost     string
-	ServerPort     string
-	Ln             net.Listener
-	quitch         chan struct{}
-	maxconnections chan struct{} // to manage the max number of client connections
-	Msgch          chan []byte
-	Connch         chan net.Conn
-	mut            sync.RWMutex //mutex to handle thread synchronization
-}
 
-func NewKioku() Kioku {
-	return Kioku{
+
+func NewKioku() types.Kioku {
+	return types.Kioku{
 		ServerHost:     constants.CONFIG.ServerHost,
 		ServerPort:     constants.CONFIG.ServerPort,
-		quitch:         make(chan struct{}),
-		maxconnections: make(chan struct{}, constants.ULIMIT),
+		Quitch:         make(chan struct{}),
+		Maxconnections: make(chan struct{}, constants.ULIMIT),
 		Msgch:          make(chan []byte, 50),
 		Connch:         make(chan net.Conn),
 	}
 }
 
-func (k *Kioku) StartListening() error {
+func StartListening(k *types.Kioku) error {
 	ln, err := net.Listen("tcp", k.ServerHost+":"+k.ServerPort)
 	log.Println("Kioku started listening on-> " + k.ServerHost + ":" + k.ServerPort)
 	if err != nil {
@@ -46,14 +37,14 @@ func (k *Kioku) StartListening() error {
 
 	defer ln.Close()
 	k.Ln = ln
-	go k.acceptLoop()
-	<-k.quitch
+	go acceptLoop(k)
+	<-k.Quitch
 	close(k.Msgch)
 	close(k.Connch)
 	return nil
 }
 
-func (k *Kioku) acceptLoop() {
+func acceptLoop(k *types.Kioku) {
 	for {
 		conn, err := k.Ln.Accept()
 		if err != nil {
@@ -62,10 +53,10 @@ func (k *Kioku) acceptLoop() {
 		}
 		// if reached max connections reject new connection else accept and start readloop
 		select {
-		case k.maxconnections <- struct{}{}:
+		case k.Maxconnections <- struct{}{}:
 			log.Println("Connected to:", conn.RemoteAddr())
 
-			go k.readLoop(conn)
+			go readLoop(k,conn)
 		default:
 			conn.Close()
 			log.Println("Connection limit reached. Rejecting new connection.")
@@ -74,11 +65,11 @@ func (k *Kioku) acceptLoop() {
 	}
 }
 
-func (k *Kioku) readLoop(conn net.Conn) {
+func readLoop(k *types.Kioku, conn net.Conn) {
 	defer func() {
 		log.Println(conn.RemoteAddr().String()+" disconnected.")
 		conn.Close()
-		<-k.maxconnections
+		<-k.Maxconnections
 	}()
 	// buf := make([]byte, 2048)
 	rw := bufio.NewReadWriter(bufio.NewReader(conn), bufio.NewWriter(conn))
@@ -94,7 +85,7 @@ func (k *Kioku) readLoop(conn net.Conn) {
 		}
 		strings.TrimSpace(argv)
 		args := strings.Fields(argv)
-		msg := cmdutils.CommandChecker(args, &constants.REGCMDS, &constants.LFU_CACHE)
+		msg := cmdutils.CommandChecker(args, k, &constants.REGCMDS, &constants.DICTIONARY, &constants.LFU_CACHE, &constants.LRU_CACHE, constants.CONFIG)
 		k.Connch <- conn
 		k.Msgch <- msg
 		time.Sleep(500 * time.Millisecond)

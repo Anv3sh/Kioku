@@ -4,7 +4,6 @@ import (
 	"log"
 	// "time"
 	// "net"
-	"github.com/Anv3sh/Kioku/internals/config"
 	"github.com/Anv3sh/Kioku/internals/constants"
 	"github.com/Anv3sh/Kioku/internals/services"
 	"github.com/Anv3sh/Kioku/internals/services/cmdutils"
@@ -12,7 +11,9 @@ import (
 
 func main() {
 	go cmdutils.CommandRegistry(&constants.REGCMDS, constants.COMMAND_LIST_PATH)
-	config.SetConfig(&constants.CONFIG)
+	constants.CONFIG.CreateConfig() // to create default config
+	constants.CONFIG.SetConfig() // to set custom config settings
+	constants.DICTIONARY.CreateDict(constants.CONFIG)
 	constants.LFU_CACHE.CreateLFU(constants.CONFIG)
 	kioku := services.NewKioku()
 
@@ -35,5 +36,5 @@ func main() {
 	// 		}
 	// 	}()
 	// }
-	log.Fatal(kioku.StartListening())
+	log.Fatal(services.StartListening(&kioku))
 }

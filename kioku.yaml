@@ -4,3 +4,5 @@ maxclients: 100
 eviction: true
 ttl: 15
 maxmemory: 0.00005
+lfu-eviction: true
+lru-evicton: false

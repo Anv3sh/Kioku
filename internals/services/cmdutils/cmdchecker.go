@@ -2,12 +2,16 @@ package cmdutils
 
 import (
 	"fmt"
-	"github.com/Anv3sh/Kioku/internals/commands"
-	"github.com/Anv3sh/Kioku/internals/storage"
 	"strings"
+
+	"github.com/Anv3sh/Kioku/internals/commands"
+	"github.com/Anv3sh/Kioku/internals/config"
+	"github.com/Anv3sh/Kioku/internals/storage"
+	"github.com/Anv3sh/Kioku/internals/types"
+
 )
 
-type CmdFunction func([]string, *storage.LFU) []byte
+type CmdFunction func([]string, *types.Kioku, *storage.Dict, *storage.LFU, *storage.LRU, config.Config) []byte
 
 const PING_FUNC = "PingCommand"
 const SET_FUNC = "SetCommand"
@@ -19,7 +23,7 @@ var CmdFunctions = map[string]CmdFunction{
 	GET_FUNC:  commands.GetCommand,
 }
 
-func CommandChecker(args []string, regcmds *RegisteredCommands, lfu *storage.LFU) []byte {
+func CommandChecker(args []string,k *types.Kioku, regcmds *RegisteredCommands, dict *storage.Dict, lfu *storage.LFU, lru *storage.LRU, config config.Config) []byte {
 	if len(args) == 0 {
 		return []byte("")
 	}
@@ -31,7 +35,7 @@ func CommandChecker(args []string, regcmds *RegisteredCommands, lfu *storage.LFU
 		return []byte(msg)
 	} else {
 		cmdfunc := CmdFunctions[cmd.Function]
-		msg := cmdfunc(args, lfu)
+		msg := cmdfunc(args,k, dict, lfu, lru, config)
 		return msg
 	}
 
