@@ -7,9 +7,12 @@ import (
 	"github.com/Anv3sh/Kioku/internals/constants"
 	"github.com/Anv3sh/Kioku/internals/services"
 	"github.com/Anv3sh/Kioku/internals/services/cmdutils"
+	"github.com/Anv3sh/Kioku/internals/assests"
+
 )
 
 func main() {
+	assests.PrintLogo()
 	go cmdutils.CommandRegistry(&constants.REGCMDS, constants.COMMAND_LIST_PATH)
 	constants.CONFIG.CreateConfig() // to create default config
 	constants.CONFIG.SetConfig() // to set custom config settings
