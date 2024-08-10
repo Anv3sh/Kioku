@@ -25,6 +25,7 @@ func NewKioku() types.Kioku {
 		Maxconnections: make(chan struct{}, constants.ULIMIT),
 		Msgch:          make(chan []byte, 50),
 		Connch:         make(chan net.Conn),
+		Opch:           make(chan []string, 50),
 	}
 }
 
@@ -85,7 +86,10 @@ func readLoop(k *types.Kioku, conn net.Conn) {
 		}
 		strings.TrimSpace(argv)
 		args := strings.Fields(argv)
-		msg := cmdutils.CommandChecker(args, k, &constants.REGCMDS, &constants.DICTIONARY, &constants.LFU_CACHE, &constants.LRU_CACHE, constants.CONFIG)
+		msg,wrcmd := cmdutils.CommandChecker(args, k, &constants.REGCMDS, &constants.DICTIONARY, &constants.LFU_CACHE, &constants.LRU_CACHE, constants.CONFIG)
+		if wrcmd{
+			k.Opch <- args
+		}
 		k.Connch <- conn
 		k.Msgch <- msg
 		time.Sleep(500 * time.Millisecond)

@@ -11,7 +11,7 @@ import (
 
 )
 
-type CmdFunction func([]string, *types.Kioku, *storage.Dict, *storage.LFU, *storage.LRU, config.Config) []byte
+type CmdFunction func([]string, *types.Kioku, *storage.Dict, *storage.LFU, *storage.LRU, config.Config) ([]byte,bool)
 
 const PING_FUNC = "PingCommand"
 const SET_FUNC = "SetCommand"
@@ -23,20 +23,20 @@ var CmdFunctions = map[string]CmdFunction{
 	GET_FUNC:  commands.GetCommand,
 }
 
-func CommandChecker(args []string,k *types.Kioku, regcmds *RegisteredCommands, dict *storage.Dict, lfu *storage.LFU, lru *storage.LRU, config config.Config) []byte {
+func CommandChecker(args []string,k *types.Kioku, regcmds *RegisteredCommands, dict *storage.Dict, lfu *storage.LFU, lru *storage.LRU, config config.Config) ([]byte, bool) {
 	if len(args) == 0 {
-		return []byte("")
+		return []byte(""), false
 	}
 	cmd, exists := regcmds.Cmds[strings.ToUpper(args[0])]
 	if !exists {
-		return []byte("Command not found.\n")
+		return []byte("Command not found.\n"), false
 	} else if len(args)-1 != cmd.TotalArgs {
 		msg := fmt.Sprintf("Takes %d arguments but %d were given.\n", cmd.TotalArgs, len(args)-1)
-		return []byte(msg)
+		return []byte(msg), false
 	} else {
 		cmdfunc := CmdFunctions[cmd.Function]
-		msg := cmdfunc(args,k, dict, lfu, lru, config)
-		return msg
+		msg, wrcmd := cmdfunc(args,k, dict, lfu, lru, config)
+		return msg, wrcmd
 	}
 
 }

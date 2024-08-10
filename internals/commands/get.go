@@ -14,11 +14,11 @@ func increasefreq(k *types.Kioku, key string, dict *storage.Dict){
 	dict.Store[key].Freq++
 }
 
-func GetCommand(args []string, k *types.Kioku, dict *storage.Dict, lfu *storage.LFU, lru *storage.LRU, config config.Config) []byte {
+func GetCommand(args []string, k *types.Kioku, dict *storage.Dict, lfu *storage.LFU, lru *storage.LRU, config config.Config) ([]byte,bool) {
 	var wg sync.WaitGroup
 	_, exists := dict.Store[args[1]]
 	if !exists {
-		return []byte("Key does not exists or evicted.\n")
+		return []byte("Key does not exists or evicted.\n"),false
 	}
 	
 	val := dict.Store[args[1]].Value
@@ -26,5 +26,5 @@ func GetCommand(args []string, k *types.Kioku, dict *storage.Dict, lfu *storage.
 	go increasefreq(k ,args[1], dict)
 	wg.Done()
 	wg.Wait()
-	return []byte("\"" + val + "\"\n")
+	return []byte("\"" + val + "\"\n"),false
 }

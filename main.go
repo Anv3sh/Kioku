@@ -19,7 +19,12 @@ func main() {
 	constants.DICTIONARY.CreateDict(constants.CONFIG)
 	constants.LFU_CACHE.CreateLFU(constants.CONFIG)
 	kioku := services.NewKioku()
+	aoffile,aof:=services.AOFFile(constants.CONFIG.AOFPolicy,constants.CONFIG.AOFPath)
+	if aof{
+		services.InMemSync(aoffile, &kioku, &constants.REGCMDS, &constants.DICTIONARY, &constants.LFU_CACHE, &constants.LRU_CACHE, constants.CONFIG)
+		go services.AOFDiskWrite(aoffile,constants.CONFIG.AOFPolicy,&kioku)
 
+	}
 	go func() {
 		for {
 			conn := <-kioku.Connch

@@ -16,6 +16,8 @@ type Config struct {
 	MaxMem float64 `mapstructure:"maxmemory"`
 	LFUEviction     bool `mapstructure:"lfu-eviction"`
 	LRUEviction 	bool `mapstructure:"lru-eviction"`
+	AOFPolicy       string   `mapstructure:"appendfsync"`
+	AOFPath         string  `mapstructure:"aoffilepath"`
 }
 
 func (config *Config) CreateConfig(){
@@ -26,6 +28,8 @@ func (config *Config) CreateConfig(){
 	config.MaxMem=0.00005
 	config.LFUEviction=true
 	config.LRUEviction=false
+	config.AOFPolicy="NO"
+	config.AOFPath="./appendonly.aof"
 }
 
 func (config *Config) SetConfig() {

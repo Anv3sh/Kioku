@@ -15,4 +15,5 @@ type Kioku struct {
 	Connch         chan net.Conn
 	RWMut            sync.RWMutex //mutex to handle thread synchronization
 	Mut				sync.Mutex	
+	Opch			chan []string
 }

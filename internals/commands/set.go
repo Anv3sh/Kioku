@@ -14,7 +14,7 @@ func storekey(k *types.Kioku, dict *storage.Dict, node *storage.Node, key string
 	dict.Store[key] = node
 }
 
-func SetCommand(args []string, k *types.Kioku ,dict *storage.Dict, lfu *storage.LFU, lru *storage.LRU, config config.Config) []byte {
+func SetCommand(args []string, k *types.Kioku ,dict *storage.Dict, lfu *storage.LFU, lru *storage.LRU, config config.Config) ([]byte,bool){
 	var wg sync.WaitGroup
 	node := storage.CreateNode(args[1],args[2])
 	// eviction on the basis of cache size
@@ -36,5 +36,5 @@ func SetCommand(args []string, k *types.Kioku ,dict *storage.Dict, lfu *storage.
 	wg.Done()
 	wg.Wait()
 	node = nil
-	return []byte("OK\n")
+	return []byte("OK\n"),true
 }

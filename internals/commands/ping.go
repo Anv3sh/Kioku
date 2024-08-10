@@ -7,6 +7,6 @@ import (
 
 )
 
-func PingCommand(args []string,k *types.Kioku, dict *storage.Dict, lfu *storage.LFU, lru *storage.LRU, config config.Config) []byte {
-	return []byte("PONG!\n")
+func PingCommand(args []string,k *types.Kioku, dict *storage.Dict, lfu *storage.LFU, lru *storage.LRU, config config.Config) ([]byte,bool) {
+	return []byte("PONG!\n"),false
 }
